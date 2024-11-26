@@ -1,13 +1,13 @@
 const mysql = require("mysql");
-
+let con;
 try {
-    const con = mysql.createConnection({
+    con = mysql.createConnection({
         host: "localhost",
         user: "root",
         password: "z10mz10m",
     });
 } catch (e) {
-    const con = mysql.createConnection({
+    con = mysql.createConnection({
         host: "localhost",
         user: "root",
         password: "z10mz10m",

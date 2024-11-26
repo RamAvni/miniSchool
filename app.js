@@ -7,14 +7,11 @@ var logger = require("morgan");
 var indexRouter = require("./routes/index");
 var usersRouter = require("./routes/users");
 var studentRouter = require("./routes/student");
-const DbRouter = require("./routes/db");
+const teacherRouter = require("./routes/teacher");
+const DbRouter = require("./db");
 
 var app = express();
-const { con } = require("con");
-
-con.connect((err) => {
-    if (err) throw err;
-});
+const { con } = require("./con");
 
 // view engine setup
 app.set("views", path.join(__dirname, "views"));
@@ -28,8 +25,8 @@ app.use(express.static(path.join(__dirname, "public")));
 
 app.use("/", indexRouter);
 app.use("/users", usersRouter);
-app.use("/db", DbRouter);
 app.use("/student", studentRouter);
+app.use("/teacher", teacherRouter);
 
 // catch 404 and forward to error handler
 app.use(function (req, res, next) {
