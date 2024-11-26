@@ -4,7 +4,7 @@ const mysql = require("mysql");
 const fsPromise = require("fs/promises");
 const path = require("path");
 
-const { con } = require("con");
+const { con } = require("./con");
 
 async function initializeDatabase() {
     enterDataBase();
@@ -30,13 +30,13 @@ function enterDataBase() {
 
 async function createTables() {
     try {
-        const files = await fsPromise.readdir(__dirname + "/../entities");
+        const files = await fsPromise.readdir(__dirname + "/entities");
 
         await Promise.all(
             files.map(async (file) => {
                 const fileName = file.replace(".json", "");
                 let sqlQuery = `CREATE TABLE ${fileName} ( `;
-                const fileData = await fsPromise.readFile(path.join(__dirname, `/../entities/${file}`), "utf-8");
+                const fileData = await fsPromise.readFile(path.join(__dirname, `/entities/${file}`), "utf-8");
                 console.log("fileData: ", fileData);
                 for (let key in JSON.parse(fileData)) {
                     sqlQuery += `${key} ${JSON.parse(fileData)[key]}, `;
