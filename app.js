@@ -10,6 +10,11 @@ var studentRouter = require("./routes/student");
 const DbRouter = require("./routes/db");
 
 var app = express();
+const { con } = require("con");
+
+con.connect((err) => {
+    if (err) throw err;
+});
 
 // view engine setup
 app.set("views", path.join(__dirname, "views"));
