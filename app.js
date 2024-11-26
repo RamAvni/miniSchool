@@ -7,8 +7,9 @@ var logger = require("morgan");
 var indexRouter = require("./routes/index");
 var usersRouter = require("./routes/users");
 var studentRouter = require("./routes/student");
-const teacherRouter = require("./routes/teacher");
-const DbRouter = require("./db");
+var teacherRouter = require("./routes/teacher");
+var classroomRouter = require("./routes/classroom");
+var DbRouter = require("./db");
 
 var app = express();
 const { con } = require("./con");
@@ -27,6 +28,7 @@ app.use("/", indexRouter);
 app.use("/users", usersRouter);
 app.use("/student", studentRouter);
 app.use("/teacher", teacherRouter);
+app.use("/classroom", classroomRouter);
 
 // catch 404 and forward to error handler
 app.use(function (req, res, next) {
