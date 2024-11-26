@@ -1,7 +1,7 @@
 const express = require("express");
 const router = express.Router();
 const mysql = require("mysql");
-const fs = require("fs");
+const fsPromise = require("fs/promises");
 const path = require("path");
 
 const con = mysql.createConnection({
@@ -10,13 +10,10 @@ const con = mysql.createConnection({
     password: "z10mz10m",
 });
 
-function initializeDatabase() {
+async function initializeDatabase() {
     con.connect((err) => {
         if (err) throw err;
         enterDataBase();
-        createAndFillTables();
-
-        // JsonifyTables();
     });
 }
 
@@ -28,14 +25,8 @@ function enterDataBase() {
                 if (err) throw err;
                 console.log("Created miniSchool", result);
             });
-            con.query("USE miniSchool", (err, result) => {
-                if (err) throw err;
-                console.log("Switched to miniSchool", result);
-            });
-
-            // createDefaultTables();
-            // fillDefaultTables();
-            createAndFillTables();
+            con.changeUser({ database: "miniSchool" });
+            createTables();
         } else if (err) {
             throw err;
         } else {
@@ -44,29 +35,36 @@ function enterDataBase() {
     });
 }
 
-function createAndFillTables() {
-    fs.readdir(__dirname + "/../entities", (err, files) => {
-        if (err) throw err;
-        files.forEach((file) => {
-            const fileName = file.replace(".json", "");
-            let sqlQuery = `CREATE TABLE ${fileName} `;
-            fs.readFile(path.join(__dirname, `/../entities/${file}`), "utf-8", (err, data) => {
-                console.log("path.join(__dirname, `/../entities/${file}`): ", path.join(__dirname, `/../entities/${file}`));
-                if (err) throw err;
-                console.log("data:", data);
-                for (let key of data) {
-                    console.log("data: ", data);
-                    sqlQuery += `(${key} ${file[key]}),`;
-                }
-                sqlQuery = sqlQuery.substring(0, sqlQuery.length - 1);
+async function createTables() {
+    try {
+        const files = await fsPromise.readdir(__dirname + "/../entities");
+
+        await Promise.all(
+            files.map(async (file) => {
+                const fileName = file.replace(".json", "");
+                let sqlQuery = `CREATE TABLE ${fileName} ( `;
+                const fileData = await fsPromise.readFile(path.join(__dirname, `/../entities/${file}`), "utf-8");
+                console.log("fileData: ", fileData);
+                for (let key in JSON.parse(fileData)) {
+                    sqlQuery += `${key} ${JSON.parse(fileData)[key]}, `;
+                } // JsonifyTables();
+                sqlQuery = sqlQuery.substring(0, sqlQuery.length - 2); //Remove last space and comma
+                sqlQuery += ")";
 
                 con.query(sqlQuery, (err) => {
                     if (err) throw err;
                 });
-            });
+            })
+        );
+        con.query("INSERT INTO admin (name, password, school_id) VALUES ('Ram', 213, 1), ('La', 645, 2)", (err) => {
+            if (err) throw err;
         });
-    });
+    } catch (e) {
+        throw e;
+    }
 }
+
+function addAdmins() {}
 
 // function createDefaultTables() {
 //     const schoolTable = "CREATE TABLE school (id INT AUTO_INCREMENT PRIMARY KEY, name VARCHAR(255), school_code INT)";
