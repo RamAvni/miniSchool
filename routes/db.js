@@ -4,17 +4,10 @@ const mysql = require("mysql");
 const fsPromise = require("fs/promises");
 const path = require("path");
 
-const con = mysql.createConnection({
-    host: "localhost",
-    user: "root",
-    password: "z10mz10m",
-});
+const { con } = require("con");
 
 async function initializeDatabase() {
-    con.connect((err) => {
-        if (err) throw err;
-        enterDataBase();
-    });
+    enterDataBase();
 }
 
 function enterDataBase() {
@@ -63,8 +56,6 @@ async function createTables() {
         throw e;
     }
 }
-
-function addAdmins() {}
 
 // function createDefaultTables() {
 //     const schoolTable = "CREATE TABLE school (id INT AUTO_INCREMENT PRIMARY KEY, name VARCHAR(255), school_code INT)";
